@@ -155,25 +155,4 @@ public function mobile_number_process($mobile_num_temp) {
 		
 		echo $msg; 
     }
-
-    public function get_telcoID($mobile_num_temp){
-		
-			$operator = substr($mobile_num_temp,0,5);
-			
-			if($operator == '88017'){
-					$telcoID = '1';
-			}else if($operator == '88018'){
-					$telcoID = '4';
-			}else if($operator == '88015'){
-					$telcoID = '5';
-			}else if($operator == '88019'){
-					$telcoID = '3';
-			}else if($operator == '88011'){
-					$telcoID = '2';				
-			}else if($operator == '88016'){
-					$telcoID = '6';				
-			}else{ $telcoID = '7'; }
-			
-			return $telcoID;
-	}
 }

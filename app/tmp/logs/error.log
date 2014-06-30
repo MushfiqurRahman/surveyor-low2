@@ -171,3 +171,19 @@
 #1 E:\xampp\htdocs\2014\surveyor-low\lib\Cake\Routing\Dispatcher.php(85): Dispatcher->_invoke(Object(SurveysController), Object(CakeRequest), Object(CakeResponse))
 #2 E:\xampp\htdocs\2014\surveyor-low\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
 #3 {main}
+2014-06-30 20:30:27 Error: [MissingControllerException] Controller class Favicon.pngController could not be found.
+#0 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2014-06-30 20:30:28 Error: [MissingControllerException] Controller class Favicon.pngController could not be found.
+#0 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2014-07-01 02:30:32 Error: [MissingActionException] Action SurveysController::favicon.png() could not be found.
+#0 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(103): Controller->invokeAction(Object(CakeRequest))
+#1 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(85): Dispatcher->_invoke(Object(SurveysController), Object(CakeRequest), Object(CakeResponse))
+#2 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2014-07-01 02:30:32 Error: [MissingActionException] Action SurveysController::favicon.png() could not be found.
+#0 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(103): Controller->invokeAction(Object(CakeRequest))
+#1 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(85): Dispatcher->_invoke(Object(SurveysController), Object(CakeRequest), Object(CakeResponse))
+#2 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}

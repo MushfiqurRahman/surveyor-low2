@@ -16,20 +16,20 @@ App::uses('AppController', 'Controller');
 class MoLogsController extends AppController{
     //put your code here    
     
-    var $keywords = array('PTR');
+    var $keywords = array('SUP');
     var $occupations = array();
     
     public function beforeFilter(){
         parent::beforeFilter();
         $this->Auth->allow(array('add_survey'));
         
-        $this->loadModel('Occupation');
-        $this->Occupation->recursive = -1;
-        $this->occupations = $this->Occupation->find('list', array('fields' => array('id','code')));
-        
-        $this->loadModel('Brand');
-        $this->Brand->recursive = -1;
-        $this->brands = $this->Brand->find('list', array('fields' => array('id','code')));
+//        $this->loadModel('Occupation');
+//        $this->Occupation->recursive = -1;
+//        $this->occupations = $this->Occupation->find('list', array('fields' => array('id','code')));
+//        
+//        $this->loadModel('Brand');
+//        $this->Brand->recursive = -1;
+//        $this->brands = $this->Brand->find('list', array('fields' => array('id','code')));
         //pr($this->occupations);exit;
     }
     
@@ -273,8 +273,8 @@ class MoLogsController extends AppController{
         }else{
             $ttl_msg_part = count($processed['params']);
 
-            if( $processed['params'][0]!='PTR' || !is_numeric($processed['params'][$ttl_msg_part-1]) || 
-                $ttl_msg_part != 8) {
+            if( $processed['params'][0]!='SUP' || !is_numeric($processed['params'][$ttl_msg_part-1]) || 
+                $ttl_msg_part != 6) {
 
                 $error = "Your SMS format is wrong, plesae try again with right format.";            
             }else if( strlen($processed['mobile_number']) <13 || strlen($processed['mobile_number'])>13 ){
@@ -285,7 +285,7 @@ class MoLogsController extends AppController{
                 //pr($repId);exit;
 
                 if( !is_array($repId) ){
-                    $error = 'Invalid PTR code! Please try again with valid code.';                    
+                    $error = 'Invalid BR code! Please try again with valid code.';                    
                 }else{
                     $this->loadModel('Survey');
 

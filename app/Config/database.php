@@ -65,7 +65,7 @@ class DATABASE_CONFIG {
 		'host' => 'localhost',
 		'login' => 'root',
 		'password' => '',
-		'database' => '2014_surveyor_low',
+		'database' => '2014_surveyor_low2',
 //            'database' => '2014_live_surveyor_low',
 		'prefix' => '',
 		//'encoding' => 'utf8',
