@@ -155,7 +155,7 @@ public function mobile_number_process($mobile_num_temp) {
 		
 		echo $msg; 
     }
-
+    
     public function get_telcoID($mobile_num_temp){
 		
 			$operator = substr($mobile_num_temp,0,5);

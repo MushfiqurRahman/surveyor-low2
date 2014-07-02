@@ -360,7 +360,11 @@ class Survey extends AppModel {
             foreach($regions as $k => $rg){
                 foreach( $current_campaign['Achievement'] as $ach ){
                     if( $ach['region_id']==$k ){
-                        $reg_achievements[$rg]['parcent_achieved'] = round(($ach['region_achieved']*100)/$ach['region_target']);
+                        if( $ach['region_target']>0 ){
+                            $reg_achievements[$rg]['parcent_achieved'] = round(($ach['region_achieved']*100)/$ach['region_target']);
+                        }else{
+                            $reg_achievements[$rg]['parcent_achieved'] = 0;
+                        }
                         $reg_achievements[$rg]['total_disbursed'] = $ach['region_achieved'];
                         break;
                     }

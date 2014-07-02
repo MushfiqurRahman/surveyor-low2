@@ -141,7 +141,7 @@ class MoLogsController extends AppController{
     /**
      * Check the sale message format, product codes validity and also format and array for sale detail
      */
-    protected function _format_survey( $params, $survey_id = null, $survey_counter = 1, $moLogId, $surveyDetails = array() ){
+    protected function _format_survey( $params, $survey_id = null, $survey_counter = 1, $moLogId, $surveyDetails = array(), $isSup = false ){
         
         $data = array();
         
@@ -154,56 +154,76 @@ class MoLogsController extends AppController{
                 $data['Survey']['survey_counter'] = $survey_counter;
             }
         }
-        
-        //checking Age
-        if( !is_numeric($params[4]) ){
-            $data['error'] = 'Sorry! Invalid Age';
-            return $data;
-        }else{
-            $data['Survey']['age'] = $params[4];
-        }
-                        
-        //checking occupations code       
-        $valid = false;
-        $occp_id = 0;
-        foreach($this->occupations as $k => $ocp ){
-            if( $ocp == $params[5] ){
-                $valid = true;
-                $occp_id = $k;
-                break;
+        //When the data is coming from PTR rather SUP
+        if( !$isSup ){
+                //checking Age
+            if( !is_numeric($params[4]) ){
+                $data['error'] = 'Sorry! Invalid Age';
+                return $data;
+            }else{
+                $data['Survey']['age'] = $params[4];
             }
-        }
-        if( !$valid ){
-            $data['error'] = 'Sorry! Invalid Occupation code!';
-            return $data;
-        }else{
-            $data['Survey']['occupation_id'] = $occp_id;
-        }
-        
-        //checking brand code       
-        $valid = false;
-        $brnd_id = 0;
-        foreach($this->brands as $k => $br ){
-            if( $br == $params[6] ){
-                $valid = true;
-                $brnd_id = $k;
-                break;
+
+            //checking occupations code       
+            $valid = false;
+            $occp_id = 0;
+            foreach($this->occupations as $k => $ocp ){
+                if( $ocp == $params[5] ){
+                    $valid = true;
+                    $occp_id = $k;
+                    break;
+                }
             }
-        }
-        if( !$valid ){
-            $data['error'] = 'Sorry! Invalid Brand code!';
-            return $data;
+            if( !$valid ){
+                $data['error'] = 'Sorry! Invalid Occupation code!';
+                return $data;
+            }else{
+                $data['Survey']['occupation_id'] = $occp_id;
+            }
+
+            //checking brand code       
+            $valid = false;
+            $brnd_id = 0;
+            foreach($this->brands as $k => $br ){
+                if( $br == $params[6] ){
+                    $valid = true;
+                    $brnd_id = $k;
+                    break;
+                }
+            }
+            if( !$valid ){
+                $data['error'] = 'Sorry! Invalid Brand code!';
+                return $data;
+            }else{
+                $data['Survey']['brand_id'] = $brnd_id;
+            }
+
+            //check mobile no
+            if( strlen($params[3])<11 || strlen($params[3])>11 ){
+                $data['error'] = 'Sorry! Consumer phone number must be of 11 digits. Please try again with right number.';
+                return $data;
+            }
+            $data['Survey']['name'] = $params[2];
+            $data['Survey']['phone'] = $params[3];
         }else{
-            $data['Survey']['brand_id'] = $brnd_id;
+            //check mobile no
+            if( strlen($params[2])<11 || strlen($params[2])>11 ){
+                $data['error'] = 'Sorry! Consumer phone number must be of 11 digits. Please try again with right number.';
+                return $data;
+            }
+            
+            //checking the date format
+            if( date('Y-m-d', strtotime($params[3])) != $params[3] ){
+                $data['error'] = 'Sorry! Invalid date format. Please write the date format as yyyy-mm-dd and try again.';
+                return $data;
+            }
+            $data['Survey']['phone'] = $params[2];
+            $data['Survey']['is_sup'] = 1;
+            $data['Survey']['permission_slip_date'] = $params[3];
+            $data['Survey']['is_right'] = $params[4]=='R'?1:0;
         }
         
-        //check mobile no
-        if( strlen($params[3])<11 || strlen($params[3])>11 ){
-            $data['error'] = 'Sorry! Consumer phone number must be of 11 digits. Please try again with right number.';
-            return $data;
-        }
-        $data['Survey']['name'] = $params[2];
-        $data['Survey']['phone'] = $params[3];
+        
         $data['Survey']['mo_log_id'] = $moLogId;
         
         return $data;
@@ -228,17 +248,6 @@ class MoLogsController extends AppController{
         if( count($res)>0 ){
             return $res;
         }
-        //In this version currently mobile number duplicacy allowed
-//        else{
-//            //checking for mobile number duplicacy
-//            $res = $this->MoLog->query('SELECT surveys.id, surveys.survey_counter FROM surveys '.
-//                        'WHERE campaign_id='.$this->current_campaign_detail['Campaign']['id'].
-//                        ' AND representative_id = '.$repId. ' AND phone="'.$customer_phone_no.'"');
-//            if( count($res)>0 ){
-//                $res['error'] = 'Sorry! This consumer has already been contacted.';
-//                return $res;
-//            }
-//        }
         return false;
     }
     
@@ -293,42 +302,82 @@ class MoLogsController extends AppController{
 
                 if( !is_array($repId) ){
                     $error = 'Invalid PTR code! Please try again with valid code.';                    
-                }else{
+                }else{                    
                     $this->loadModel('Survey');
+                    
+                    //when the keyword is 'PTR'
+                    if($processed['params'][0]=='PTR' ){
+                        
+                        $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][3], $processed['params'][7]);
 
-                    $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][3], $processed['params'][7]);
+                        if( isset($res['error']) ){
+                            $error = $res['error'];
+                        }else if(count($res)>0 && $res!=false) { 
+                            $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'], $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res);
 
-                    if( isset($res['error']) ){
-                        $error = $res['error'];
-                    }else if(count($res)>0 && $res!=false) { 
-                        $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'], $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res);
+                            if( isset($survey_detail['error']) ){   
+                                $error = $survey_detail['error'];
+                            }else{
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'], 
+                                        $survey_detail['Survey'], $res[0]['surveys']['id']);   
 
-                        if( isset($survey_detail['error']) ){   
-                            $error = $survey_detail['error'];
-                        }else{
-                            $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
-                                    $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'], 
-                                    $survey_detail['Survey'], $res[0]['surveys']['id']);   
-
-                            $errorFound = false;
-                            $msg = 'Thank you! Your message have been updated.';
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been updated.';
+                            }
                         }
-                    }
-                    else {
-                        $survey_detail = $this->_format_survey($processed['params'], null, $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId']);
+                        else {
+                            $survey_detail = $this->_format_survey($processed['params'], null, $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId']);
 
-                        if( isset($survey_detail['error']) ){                    
-                            $error = $survey_detail['error'];
-                        }else{                            
-                            $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
-                                    $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'],
-                                    $survey_detail['Survey']);//                    
+                            if( isset($survey_detail['error']) ){                    
+                                $error = $survey_detail['error'];
+                            }else{                            
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'],
+                                        $survey_detail['Survey']);//                    
 
-                            $errorFound = false;
-                            $msg = 'Thank you! Your message have been received.';
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been received.';
 
-                            $this->loadModel('Achievement');
-                            $this->Achievement->increment_chievement($repId[0]['representatives']['house_id'], $this->current_campaign_detail['Campaign']['id']);
+                                $this->loadModel('Achievement');
+                                $this->Achievement->increment_chievement($repId[0]['representatives']['house_id'], $this->current_campaign_detail['Campaign']['id']);
+                            }
+                        }
+                    }//when the keyword is 'SUP'
+                    else{
+                        $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][2], $processed['params'][5]);
+
+                        if( isset($res['error']) ){
+                            $error = $res['error'];
+                        }else if(count($res)>0 && $res!=false) { 
+                            $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'],
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res, 1);
+
+                            if( isset($survey_detail['error']) ){   
+                                $error = $survey_detail['error'];
+                            }else{
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'], 
+                                        $survey_detail['Survey'], $res[0]['surveys']['id']);   
+
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been updated.';
+                            }
+                        }
+                        else {
+                            $survey_detail = $this->_format_survey($processed['params'], null, 
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], array(), 1);
+
+                            if( isset($survey_detail['error']) ){                    
+                                $error = $survey_detail['error'];
+                            }else{                            
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'],
+                                        $survey_detail['Survey']);//                    
+
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been received.';
+                            }
                         }
                     }
                 }

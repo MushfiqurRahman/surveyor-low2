@@ -97,3 +97,16 @@
 8801675832989 Thank you! Your message have been received.	2014-02-24 09:54 PM
 8801675832989 Thank you! Your message have been updated.	2014-02-24 09:54 PM
 8801675832989 Campaign has been finished for today. Please try again tomorrow within campaign time (08:00 - 21:54)	2014-02-24 09:56 PM
+8801685089560 Campaign has been finished for today. Please try again tomorrow within campaign time ( to )	2014-07-03 05:27 AM
+8801685089560 Sorry! Invalid date formta. Please write the date format as dd-mm-yyyy and try again.	2014-07-03 05:28 AM
+8801685089560 Sorry! Invalid date format. Please write the date format as dd-mm-yyyy and try again.	2014-07-03 05:30 AM
+8801685089560 Sorry! Invalid date format. Please write the date format as dd-mm-yyyy and try again.	2014-07-03 05:32 AM
+8801685089560 Thank you! Your message have been received.	2014-07-03 05:33 AM
+8801685089560 Thank you! Your message have been received.	2014-07-03 05:33 AM
+8801685089560 Thank you! Your message have been received.	2014-07-03 05:36 AM
+8801685089560 Your SMS format is wrong, plesae try again with right format.	2014-07-03 05:36 AM
+8801685089560 Thank you! Your message have been updated.	2014-07-03 05:38 AM
+8801685089560 Thank you! Your message have been updated.	2014-07-03 05:38 AM
+8801685089560 Thank you! Your message have been updated.	2014-07-03 05:39 AM
+8801685089560 Thank you! Your message have been received.	2014-07-03 05:41 AM
+8801685089560 Thank you! Your message have been updated.	2014-07-03 05:42 AM
