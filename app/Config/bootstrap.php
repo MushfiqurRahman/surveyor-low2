@@ -84,7 +84,7 @@
  *	));
  */
 Cache::config('default', array('engine' => 'File'));
-Configure::write('base_url','http://localhost/2014/surveyor-low/');
+Configure::write('base_url','http://localhost/2014/surveyor-low2/');
 
 /**
  * The settings below can be used to set additional paths to models, views and controllers.

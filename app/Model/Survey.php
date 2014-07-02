@@ -115,6 +115,60 @@ class Survey extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		'age' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+			'notempty' => array(
+				'rule' => array('notempty'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'brand_id' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+			'notempty' => array(
+				'rule' => array('notempty'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'occupation_id' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+			'notempty' => array(
+				'rule' => array('notempty'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
@@ -142,6 +196,20 @@ class Survey extends AppModel {
 		'MoLog' => array(
 			'className' => 'MoLog',
 			'foreignKey' => 'mo_log_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Brand' => array(
+			'className' => 'Brand',
+			'foreignKey' => 'brand_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Occupation' => array(
+			'className' => 'Occupation',
+			'foreignKey' => 'occupation_id',
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
@@ -188,8 +256,8 @@ class Survey extends AppModel {
                                         'fields' => array('title'),
                                         'Region' => array('fields' => array('title')))),
                         ),
-//                    'Occupation' => array('title'),
-//                    'Brand' => array('title')
+                    'Occupation' => array('title'),
+                    'Brand' => array('title')
                 );
             }else{                
                 $conditions = array();
@@ -210,8 +278,8 @@ class Survey extends AppModel {
                                         'fields' => array('title'),
                                         'Region' => array('fields' => array('title')))),
                         ),
-//                    'Occupation' => array('title'),
-//                    'Brand' => array('title')
+                    'Occupation' => array('title'),
+                    'Brand' => array('title')
                 );
             }
         }

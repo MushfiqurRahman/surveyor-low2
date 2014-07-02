@@ -45,19 +45,19 @@ class Brand extends AppModel {
  *
  * @var array
  */
-//	public $hasMany = array(		
-//		'Survey' => array(
-//			'className' => 'Survey',
-//			'foreignKey' => 'brand_id',
-//			'dependent' => false,
-//			'conditions' => '',
-//			'fields' => '',
-//			'order' => '',
-//			'limit' => '',
-//			'offset' => '',
-//			'exclusive' => '',
-//			'finderQuery' => '',
-//			'counterQuery' => ''
-//		)
-//	);
+	public $hasMany = array(		
+		'Survey' => array(
+			'className' => 'Survey',
+			'foreignKey' => 'brand_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		)
+	);
 }

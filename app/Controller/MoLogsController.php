@@ -16,20 +16,20 @@ App::uses('AppController', 'Controller');
 class MoLogsController extends AppController{
     //put your code here    
     
-    var $keywords = array('SUP');
+    var $keywords = array('PTR', 'SUP');
     var $occupations = array();
     
     public function beforeFilter(){
         parent::beforeFilter();
         $this->Auth->allow(array('add_survey'));
         
-//        $this->loadModel('Occupation');
-//        $this->Occupation->recursive = -1;
-//        $this->occupations = $this->Occupation->find('list', array('fields' => array('id','code')));
-//        
-//        $this->loadModel('Brand');
-//        $this->Brand->recursive = -1;
-//        $this->brands = $this->Brand->find('list', array('fields' => array('id','code')));
+        $this->loadModel('Occupation');
+        $this->Occupation->recursive = -1;
+        $this->occupations = $this->Occupation->find('list', array('fields' => array('id','code')));
+        
+        $this->loadModel('Brand');
+        $this->Brand->recursive = -1;
+        $this->brands = $this->Brand->find('list', array('fields' => array('id','code')));
         //pr($this->occupations);exit;
     }
     
@@ -272,11 +272,18 @@ class MoLogsController extends AppController{
                     $this->current_campaign_detail['Campaign']['end_time'].')';
         }else{
             $ttl_msg_part = count($processed['params']);
-
-            if( $processed['params'][0]!='SUP' || !is_numeric($processed['params'][$ttl_msg_part-1]) || 
-                $ttl_msg_part != 6) {
+            
+            if( $processed['params'][0]!='PTR' && $processed['params'][0]!='SUP'){
+                $error = "Your keyword is wrong, please try again with right keywork.";
+            }
+            else if( $processed['params'][0]=='PTR' && (!is_numeric($processed['params'][$ttl_msg_part-1]) || 
+                $ttl_msg_part != 8) ) {
 
                 $error = "Your SMS format is wrong, plesae try again with right format.";            
+            }else if( $processed['params'][0]=='SUP' && (!is_numeric($processed['params'][$ttl_msg_part-1]) || 
+                $ttl_msg_part != 6) ){
+                $error = "Your SMS format is wrong, plesae try again with right format.";            
+                
             }else if( strlen($processed['mobile_number']) <13 || strlen($processed['mobile_number'])>13 ){
                 $error = 'Sorry! Your mobile number is invalid.';
             }else{                           
@@ -285,7 +292,7 @@ class MoLogsController extends AppController{
                 //pr($repId);exit;
 
                 if( !is_array($repId) ){
-                    $error = 'Invalid BR code! Please try again with valid code.';                    
+                    $error = 'Invalid PTR code! Please try again with valid code.';                    
                 }else{
                     $this->loadModel('Survey');
 
