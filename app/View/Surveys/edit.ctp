@@ -2,18 +2,19 @@
 <?php echo $this->Form->create('Survey');?>
 	<fieldset>
 		<legend><?php echo __('Edit Survey'); ?></legend>
-	<?php
+	<?php        
 		echo $this->Form->input('id');
-		echo $this->Form->input('campaign_id');
+//		echo $this->Form->input('campaign_id');
 		echo $this->Form->input('house_id');
 		echo $this->Form->input('representative_id');
-		echo $this->Form->input('mo_log_id');
 		echo $this->Form->input('survey_counter');
 		echo $this->Form->input('name');
 		echo $this->Form->input('phone');
-		echo $this->Form->input('age_id');
-		echo $this->Form->input('adc');
-		echo $this->Form->input('occupation_id');
+//		echo $this->Form->input('age_id');
+                ?>
+          
+                <?php
+		echo $this->Form->input('occupation_id', array('empty' => 'Select Occupation'));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit'));?>

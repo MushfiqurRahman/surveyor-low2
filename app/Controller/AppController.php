@@ -62,12 +62,12 @@ class AppController extends Controller {
         $conditions = array();
         $conditions['DATE(Campaign.start_date) <='] = date('Y-m-d');
         $conditions['DATE(Campaign.end_date) >='] = date('Y-m-d');
+        
         $this->current_campaign_detail = $this->Campaign->find('first',array('conditions' => $conditions));
         
         $diff = abs(strtotime($this->current_campaign_detail['Campaign']['start_date']) - strtotime($this->current_campaign_detail['Campaign']['end_date']));
         
-        $this->loadModel('OffDay');
-        
+        $this->loadModel('OffDay');       
         
         $this->total_camp_days = 1+($diff/(24*3600)) - ($this->OffDay->get_total_off_days(
                 $this->current_campaign_detail['Campaign']['id'], 

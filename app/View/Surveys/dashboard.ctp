@@ -87,6 +87,40 @@
                                     </form>
                                     </div>
                                 
+                                <!--------- FOR SUPERVISER REPORT ----------->
+                                <div style="height:75px;">
+                                    <?php echo $this->Form->create('Survey',array('type' => 'post', 'action' => 'sup_report', 'class' => 'form-horizontal'));?>
+                                            <div style="width:20%; margin-left:50px;">
+                                                    <label>Superviser Report</label>
+                                            </div>
+
+                                            <div style="width:100%; margin-top:10px; margin-left:50px;">
+                                                <?php 
+                                                    echo $this->Form->input('Region.id',array('type' => 'select', 
+                                                        'options' => $regions, 'empty' => 'All Region', 'label' => false,
+                                                        'class' => 'regionId', 'id' => 'superviser', 'style' => 'width:23%;float:left;',
+                                                        'div' => false));
+
+                                                    echo $this->Form->input('Area.id', array('type' => 'select', 
+                                                        'options' => array(), 'empty' => 'All Area','label' => false,
+                                                        'id' => 'area_superviser', 'class' => 'areaId', 'style' => 'width:23%;float:left; margin-left:15px;','div' => false));
+
+                                                    echo $this->Form->input('House.id', array('type' => 'select',
+                                                        'options' => array(), 'empty' => 'All House','label' => false,
+                                                        'id' => 'house_superviser', 'style' => 'width:23%;float:left; margin-left:15px; margin-right:20px;',
+                                                        'div' => false));
+
+                                                    //echo $this->Form->end(array('label' => 'Submit', 'class' => 'mws-button orange','style' => 'float:left; margin-top:-2px;'));
+                                                ?>										
+                                                    <input type="submit" value="Submit" class="btn green" style="margin-top:-2px;"/>
+                                                    <input type="reset" value="Reset" class="btn red" style="margin-top:-2px;"/>
+                                                    <?php echo $this->Form->end();?>
+                                            </div>
+                                    </form>
+                                    </div>
+                                
+                                
+                                
                                 <?php if($loggedinUser['is_cc']){?>
                                 
                                 <div style="height:75px;">

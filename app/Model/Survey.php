@@ -95,16 +95,16 @@ class Survey extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
-		'name' => array(
-			'notempty' => array(
-				'rule' => array('notempty'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
-			),
-		),
+//		'name' => array(
+//			'notempty' => array(
+//				'rule' => array('notempty'),
+//				//'message' => 'Your custom message here',
+//				//'allowEmpty' => false,
+//				//'required' => false,
+//				//'last' => false, // Stop validation after this rule
+//				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+//			),
+//		),
 		'phone' => array(
 			'notempty' => array(
 				'rule' => array('notempty'),
@@ -151,24 +151,24 @@ class Survey extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
-		'occupation_id' => array(
-			'numeric' => array(
-				'rule' => array('numeric'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
-			),
-			'notempty' => array(
-				'rule' => array('notempty'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
-			),
-		),
+//		'occupation_id' => array(
+//			'numeric' => array(
+//				'rule' => array('numeric'),
+//				//'message' => 'Your custom message here',
+//				//'allowEmpty' => false,
+//				//'required' => false,
+//				//'last' => false, // Stop validation after this rule
+//				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+//			),
+//			'notempty' => array(
+//				'rule' => array('notempty'),
+//				//'message' => 'Your custom message here',
+//				//'allowEmpty' => false,
+//				//'required' => false,
+//				//'last' => false, // Stop validation after this rule
+//				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+//			),
+//		),
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
@@ -285,6 +285,23 @@ class Survey extends AppModel {
         }
         
         /**
+        *
+        * @return type 
+        */
+        public function get_sup_contain_array(){
+            return array(
+                'Representative' => array(
+                    'fields' => array('id', 'name','superviser_name', 'br_code'),
+                    'House' => array(
+                                'fields' => array('title'),
+                                'Area' => array(
+                                    'fields' => array('title'),
+                                    'Region' => array('fields' => array('title')))),
+                    ),
+            );
+        }
+        
+        /**
          *
          * @return type 
          */
@@ -331,6 +348,37 @@ class Survey extends AppModel {
             if( isset($data['brand_id']) && !empty($data['brand_id']) ){
                 $conditions[]['Survey.brand_id'] = $data['brand_id'];
             }
+            
+            $conditions[]['Survey.is_sup'] = 0;
+            
+            return $conditions;
+        }
+        
+        /**
+         *
+         * @return type 
+         */
+        //public function set_conditions( $surveyIds = null, $data = array(), $is_feedback = false ){
+        public function set_sup_conditions( $houseIds = null, $data = array(), $campaignId = false ){
+            
+            $conditions = array();            
+            
+            if( $campaignId ){
+                $conditions[]['Survey.campaign_id'] = $campaignId;
+            }
+            if( $houseIds ){
+                $conditions[]['Survey.house_id'] = $houseIds;                
+            }else{
+                $conditions[]['Survey.house_id'] = 0;
+            }
+            if( isset($data['start_date']) && !empty($data['start_date']) ){
+                $conditions[]['DATE(Survey.created) >='] = $data['start_date'];
+            }
+            if( isset($data['end_date']) && !empty($data['end_date']) ){
+                $conditions[]['DATE(Survey.created) <='] = $data['end_date'];
+            }            
+            $conditions[]['Survey.is_sup'] = 1;
+            
             return $conditions;
         }
         
@@ -432,6 +480,42 @@ class Survey extends AppModel {
                 $formatted[$i]['age'] = $srv['Survey']['age'];
                 $formatted[$i]['occupation'] = $srv['Occupation']['title'];
                 $formatted[$i]['brand'] = $srv['Brand']['title'];
+                $formatted[$i]['date'] = date('Y-m-d',strtotime($srv['Survey']['created']));
+                
+                $i++;
+            }
+            return $formatted;
+        }
+        
+        /**
+         * @desc Used in surveys controller for excel export. In the export_report method
+         * @param type $surveys 
+         */
+        public function format_for_sup_export( $surveys ){
+            $areaRegionList = $this->House->Area->find('all', array('fields' => array('id','region_id','title', 'Region.title'),
+                'recursive' => 0));
+                        
+            $formatted = array();
+            $i = 0;
+            
+            foreach( $surveys as $srv ){
+//                $formatted[$i]['id'] = $srv['Survey']['id'];
+                $formatted[$i]['id'] = $i+1;
+                
+                foreach ($areaRegionList as $v){
+                    if( $v['Area']['id'] == $srv['House']['area_id'] ){
+                        $formatted[$i]['region'] = $v['Region']['title'];
+                        $formatted[$i]['area'] = $v['Area']['title'];
+                        break;
+                    }
+                }
+                $formatted[$i]['house'] = $srv['House']['title'];
+                $formatted[$i]['br_name'] = $srv['Representative']['name'];
+                $formatted[$i]['br_code'] = $srv['Representative']['br_code'];
+                $formatted[$i]['sup_name'] = $srv['Representative']['superviser_name'];
+                $formatted[$i]['phone_no'] = $srv['Survey']['phone'];
+                $formatted[$i]['permission_slip_date'] = $srv['Survey']['permission_slip_date'];
+                $formatted[$i]['is_right'] = $srv['Survey']['is_right'];
                 $formatted[$i]['date'] = date('Y-m-d',strtotime($srv['Survey']['created']));
                 
                 $i++;

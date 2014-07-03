@@ -189,14 +189,36 @@ class Achievement extends AppModel {
          * @param type $house_id 
          */
         public function increment_chievement( $house_id, $campaign_id ){
+                      
             $area_id = $this->Region->Area->House->field('area_id',array('House.id' => $house_id));
             $region_id = $this->Region->Area->field('region_id',array('Area.id' => $area_id));
+            
+//            $this->log($house_id,'error');
+//            $this->log($campaign_id,'error');
+//            $this->log($region_id,'error');
             
             $this->query('UPDATE achievements SET achievements.region_achieved=achievements.region_achieved+1 '.
                     'WHERE achievements.region_id='.$region_id.' AND achievements.campaign_id='.$campaign_id);
             
             $this->query('UPDATE campaign_details SET campaign_details.house_achieved = '.
                     'campaign_details.house_achieved+1 WHERE campaign_details.campaign_id='.
+                    $campaign_id.' AND campaign_details.house_id='.$house_id);
+        }
+        
+        /**
+         *
+         * @param type $house_id 
+         */
+        public function decrement_achievement( $house_id, $campaign_id ){
+                      
+            $area_id = $this->Region->Area->House->field('area_id',array('House.id' => $house_id));
+            $region_id = $this->Region->Area->field('region_id',array('Area.id' => $area_id));
+                       
+            $this->query('UPDATE achievements SET achievements.region_achieved=achievements.region_achieved-1 '.
+                    'WHERE achievements.region_id='.$region_id.' AND achievements.campaign_id='.$campaign_id);
+            
+            $this->query('UPDATE campaign_details SET campaign_details.house_achieved = '.
+                    'campaign_details.house_achieved-1 WHERE campaign_details.campaign_id='.
                     $campaign_id.' AND campaign_details.house_id='.$house_id);
         }
         

@@ -41,7 +41,8 @@ class SurveysController extends AppController {
             if($this->current_campaign_detail){
                 $achievements['total_allocation'] = $this->current_campaign_detail['Campaign']['total_target'];            
                 $achievements['achieved_total'] = $this->Survey->find('count', array('conditions' => array(
-                    'campaign_id' => $this->current_campaign_detail['Campaign']['id']
+                    'campaign_id' => $this->current_campaign_detail['Campaign']['id'],
+                    'is_sup' => 0,
                     ),
                     'recursive' => -1));
 
@@ -78,7 +79,8 @@ class SurveysController extends AppController {
             $this->paginate = array(
                 'contain' => $this->Survey->get_contain_array(),
                 //'conditions' => $this->Survey->set_conditions($SurveyIds, $this->request->data),                                    
-                'conditions' => $this->Survey->set_conditions($houseIds, $this->request->data, false, $this->current_campaign_detail['Campaign']['id']),                                    
+                'conditions' => $this->Survey->set_conditions($houseIds, 
+                        $this->request->data, false, $this->current_campaign_detail['Campaign']['id']),                                    
                 'order' => array('Survey.created' => 'DESC'),
                 'limit' => $this->Auth->user('pagination_limit'),
             );                
@@ -95,6 +97,43 @@ class SurveysController extends AppController {
             $this->set('houses', $houseList);
             $this->set('occupations', $this->Survey->Occupation->find('list'));
             $this->set('brands', $this->Survey->Brand->find('list'));
+            $this->set('Surveys', $Surveys);
+        }
+        
+        /**
+         * Report for superviser survey data
+         */
+        public function sup_report(){
+            $this->_set_request_data_from_params();  
+            
+            $houseList = $this->Survey->House->house_list($this->request->data);//('list', array('conditions' => $this->_set_conditions()));
+                                   
+            if( isset($this->request->data['House']['id']) && !empty($this->request->data['House']['id']) ){
+                $houseIds[] = $this->request->data['House']['id'];
+            }else{
+                $houseIds = $this->Survey->House->id_from_list($houseList);                
+            }
+            
+            $this->Survey->Behaviors->load('Containable');
+
+            $this->paginate = array(
+                'contain' => $this->Survey->get_sup_contain_array(),
+                'conditions' => $this->Survey->set_sup_conditions($houseIds, 
+                        $this->request->data, $this->current_campaign_detail['Campaign']['id']),                                    
+                'order' => array('Survey.created' => 'DESC'),
+                'limit' => $this->Auth->user('pagination_limit'),
+            );                
+            $Surveys = $this->paginate();
+            
+//            pr($Surveys);exit;
+            
+//            $this->set('achievements',$this->Survey->Campaign->achievements_by_house(
+//                    $houseIds, $this->current_campaign_detail['Campaign']['id'],
+//                    $this->total_camp_days, $this->day_passed));
+
+            //pr($Surveys);exit;           
+            
+            $this->set('houses', $houseList);            
             $this->set('Surveys', $Surveys);
         }
         
@@ -136,7 +175,44 @@ class SurveysController extends AppController {
                 $Surveys = $this->Survey->format_for_export($Surveys);
                 $this->set('surveys',$Surveys); 
             }
-        }        
+        }      
+        
+        /**
+         * @desc Export report in xlsx file 
+         */
+        public function export_sup_report(){
+            $this->layout = 'ajax';        
+            
+            ini_set('memory_limit', '2024M');
+            
+            if( !empty($this->request->data) ){
+                
+                $houseList = $this->Survey->House->house_list($this->request->data);
+                       
+                if( isset($this->request->data['House']['id']) && !empty($this->request->data['House']['id']) ){
+                    $houseIds[] = $this->request->data['House']['id'];
+                }else{
+                    $houseIds = $this->Survey->House->id_from_list($houseList);                
+                }   
+                
+                $this->Survey->unbindModel(array('belongsTo' => 
+                    array('Campaign','MoLog'),
+                    'hasOne' => array('Feedback')));
+
+                $Surveys = $this->Survey->find('all', array(
+                    'fields' => array('id','house_id','representative_id','phone',
+                        'permission_slip_date','is_right',
+                        'created', 'Representative.name','Representative.br_code',
+                        'Representative.superviser_name',
+                        'House.title','House.area_id'),
+                    //'conditions' => $this->Survey->set_conditions($SurveyIds, $this->request->data),
+                    'conditions' => $this->Survey->set_sup_conditions($houseIds, $this->request->data, $this->current_campaign_detail['Campaign']['id']),
+                    'order' => array('Survey.created' => 'DESC'),      
+                ));                 
+                $Surveys = $this->Survey->format_for_sup_export($Surveys);
+                $this->set('surveys',$Surveys); 
+            }
+        }
         
         /**
          *
@@ -160,19 +236,6 @@ class SurveysController extends AppController {
             return $conditions;
         }
 
-/**
- * view method
- *
- * @param string $id
- * @return void
- */
-	public function view($id = null) {
-		$this->Survey->id = $id;
-		if (!$this->Survey->exists()) {
-			throw new NotFoundException(__('Invalid survey'));
-		}
-		$this->set('survey', $this->Survey->read(null, $id));
-	}
 
 /**
  * add method
@@ -223,7 +286,7 @@ class SurveysController extends AppController {
 		$campaigns = $this->Survey->Campaign->find('list');
 		$representatives = $this->Survey->Representative->find('list');
 		$moLogs = $this->Survey->MoLog->find('list');
-		$ages = $this->Survey->Age->find('list');
+		
 		$occupations = $this->Survey->Occupation->find('list');
 		$houses = $this->Survey->House->find('list');
 		$this->set(compact('campaigns', 'representatives', 'moLogs', 'ages', 'occupations', 'houses'));
@@ -240,12 +303,23 @@ class SurveysController extends AppController {
 			throw new MethodNotAllowedException();
 		}
 		$this->Survey->id = $id;
+                
+                //since for the 'PTR' survey achievements should be reduced
+                $surveyDetail = $this->Survey->read();
+                
+                
 		if (!$this->Survey->exists()) {
 			throw new NotFoundException(__('Invalid survey'));
 		}
 		if ($this->Survey->delete()) {
-			$this->Session->setFlash(__('Survey deleted'));
-			$this->redirect(array('action' => 'index'));
+                    //for 'PTR' survey achievements should be adjusted
+                    if( !$surveyDetail['Survey']['is_sup']){  
+                        $this->loadModel('Achievement');
+                        $this->Achievement->decrement_achievement($surveyDetail['Survey']['house_id'], $this->current_campaign_detail['Campaign']['id']);
+                        
+                    }
+                    $this->Session->setFlash(__('Survey deleted'));
+                    $this->redirect(array('action' => 'index'));
 		}
 		$this->Session->setFlash(__('Survey was not deleted'));
 		$this->redirect(array('action' => 'index'));

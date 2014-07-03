@@ -236,19 +236,36 @@ class MoLogsController extends AppController{
      * @param type $msg_counter
      * @return boolean 
      */
-    protected function _is_update( $repId, $customer_phone_no, $msg_counter = 0 ){
-        
-        $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
-                    'WHERE surveys.representative_id='.$repId.
-                    ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
-                    ' AND surveys.survey_counter='.$msg_counter.' AND DATE(surveys.created)="'.
-                date('Y-m-d').'"';
-        $res = $this->MoLog->query($qry);
+    protected function _is_update( $repId, $customer_phone_no, $msg_counter = 0, $isSup = false ){
+        //when checking the supervisers sms
+        if( $isSup ){
+            $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
+                        'WHERE surveys.representative_id='.$repId.
+                        ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
+                        ' AND surveys.survey_counter='.$msg_counter.
+                        ' AND surveys.is_sup=1'.
+                        ' AND DATE(surveys.created)="'.date('Y-m-d').'"';
+            $res = $this->MoLog->query($qry);
 
-        if( count($res)>0 ){
-            return $res;
+            if( count($res)>0 ){
+                return $res;
+            }
+            return false;
+        }//when checking the representatives sms
+        else{
+            $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
+                        'WHERE surveys.representative_id='.$repId.
+                        ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
+                        ' AND surveys.survey_counter='.$msg_counter.
+                        ' AND surveys.is_sup=0'.
+                        ' AND DATE(surveys.created)="'.date('Y-m-d').'"';
+            $res = $this->MoLog->query($qry);
+
+            if( count($res)>0 ){
+                return $res;
+            }
+            return false;
         }
-        return false;
     }
     
     //check whether the received sms is in campaigns working hours or not
@@ -345,7 +362,8 @@ class MoLogsController extends AppController{
                         }
                     }//when the keyword is 'SUP'
                     else{
-                        $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][2], $processed['params'][5]);
+                        $res = $this->_is_update($repId[0]['representatives']['id'],
+                                $processed['params'][2], $processed['params'][5], true);
 
                         if( isset($res['error']) ){
                             $error = $res['error'];
