@@ -125,15 +125,11 @@ class SurveysController extends AppController {
             );                
             $Surveys = $this->paginate();
             
-//            pr($Surveys);exit;
-            
-//            $this->set('achievements',$this->Survey->Campaign->achievements_by_house(
-//                    $houseIds, $this->current_campaign_detail['Campaign']['id'],
-//                    $this->total_camp_days, $this->day_passed));
-
-            //pr($Surveys);exit;           
-            
-            $this->set('houses', $houseList);            
+            $this->set('supervisers', $this->Survey->Representative->find('list', array(
+                'fields' => array('id','superviser_name'),
+                'conditions' => array('superviser_id' => 0,'house_id' => $houseIds)
+            )));
+                       
             $this->set('Surveys', $Surveys);
         }
         
@@ -315,8 +311,7 @@ class SurveysController extends AppController {
                     //for 'PTR' survey achievements should be adjusted
                     if( !$surveyDetail['Survey']['is_sup']){  
                         $this->loadModel('Achievement');
-                        $this->Achievement->decrement_achievement($surveyDetail['Survey']['house_id'], $this->current_campaign_detail['Campaign']['id']);
-                        
+                        $this->Achievement->decrement_achievement($surveyDetail['Survey']['house_id'], $this->current_campaign_detail['Campaign']['id']);                        
                     }
                     $this->Session->setFlash(__('Survey deleted'));
                     $this->redirect(array('action' => 'index'));

@@ -69,9 +69,9 @@
     <div class="controls">
         <?php 
             //echo $this->Form->create('Survey',array('type' => 'get', 'action'=>'report', 'class' => 'form-horizontal'));    
-            $selected_house_id = isset($this->data['House']['id']) ? $this->data['House']['id'] : '';
-            echo $this->Form->input('House.id',array('type' => 'select', 'options' => $houses, 
-                'label' => false, 'class' => 'span6 m-wrap', 'empty' => 'Choose a House', 'selected' => $selected_house_id));
+            $selected_sup_id = isset($this->data['representative_id']) ? $this->data['representative_id'] : '';
+            echo $this->Form->input('representative_id',array('type' => 'select', 'options' => $supervisers, 
+                'label' => false, 'class' => 'span6 m-wrap', 'empty' => 'Choose a Superviser', 'selected' => $selected_sup_id));
         ?>
         <?php
             if( isset($this->data['Region']['id']) ){
@@ -79,6 +79,9 @@
             }
             if( isset($this->data['Area']['id']) ){
                 echo $this->Form->input('Area.id', array('type' => 'hidden'));
+            }
+            if( isset($this->data['House']['id']) ){
+                echo $this->Form->input('House.id', array('type' => 'hidden'));
             }
         ?>
     </div>
@@ -102,6 +105,10 @@
             if( isset($this->data['end_date']) ){
                 $url_params['end_date'] = $this->data['end_date'];
             }
+            if( isset($this->data['representative_id']) ){
+                $url_params['representative_id'] = $this->data['representative_id'];
+            }
+            
             if( isset($this->data['Region']['id']) && $this->data['Region']['id']){
                 $url_params['region_id'] = $this->data['Region']['id'];
             }

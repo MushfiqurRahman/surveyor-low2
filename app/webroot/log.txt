@@ -126,3 +126,5 @@
 8801685089560 Thank you! Your message have been received.	2014-07-04 01:01 AM
 8801685089560 Thank you! Your message have been received.	2014-07-04 01:02 AM
 8801685089560 Thank you! Your message have been received.	2014-07-04 01:02 AM
+8801685089560 Sorry! Invalid date format. Please write the date format as yyyy-mm-dd and try again.	2014-07-04 01:21 AM
+8801685089560 Thank you! Your message have been received.	2014-07-04 01:22 AM

@@ -379,6 +379,21 @@ class Survey extends AppModel {
             }            
             $conditions[]['Survey.is_sup'] = 1;
             
+            if(isset($data['representative_id']) && !empty($data['representative_id'])){
+                //since superviser id has been select thats why representatives id should be found
+                $representativesList = $this->Representative->find('list', array(
+                    'fields' => array('id','name'),
+                    'conditions' => array('superviser_id' => $data['representative_id'])
+                ));
+                $representativesIds = array();
+                foreach($representativesList as $k =>$v){
+                    $representativesIds[] = $k;
+                }
+                $conditions[]['Survey.representative_id'] = $representativesIds;
+            }
+            
+//            $this->log(print_r($conditions,true),'error');
+            
             return $conditions;
         }
         
