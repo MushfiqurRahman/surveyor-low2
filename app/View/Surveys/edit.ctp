@@ -2,20 +2,28 @@
 <?php echo $this->Form->create('Survey');?>
 	<fieldset>
 		<legend><?php echo __('Edit Survey'); ?></legend>
-	<?php        
-		echo $this->Form->input('id');
-//		echo $this->Form->input('campaign_id');
-		echo $this->Form->input('house_id');
-		echo $this->Form->input('representative_id');
-		echo $this->Form->input('survey_counter');
-		echo $this->Form->input('name');
-		echo $this->Form->input('phone');
-//		echo $this->Form->input('age_id');
-                ?>
-          
-                <?php
-		echo $this->Form->input('occupation_id', array('empty' => 'Select Occupation'));
-	?>
+	<?php        //pr($this->data);exit;
+            echo $this->Form->input('id');
+            echo $this->Form->input('house_id');
+            echo $this->Form->input('representative_id');
+            echo $this->Form->input('survey_counter');
+            echo $this->Form->input('phone', array('required' => true));
+            if( !$this->data['Survey']['is_sup']) {
+                echo $this->Form->input('name', array('required' => true));
+                echo $this->Form->input('brand_id');                    
+                echo $this->Form->input('age', array('required' => true));
+                echo $this->Form->input('occupation_id', array('empty' => 'Select Occupation'));
+            }else{
+        ?>
+            <input size="25" name="data[Survey][permission_slip_date]" onFocus="this.value=''" onClick="showCalendarControl(this);" type="text"  value="<?php echo isset($this->data['Survey']['permission_slip_date']) ? $this->data['Survey']['permission_slip_date'] : '';?>" required="required"/>
+        <?php
+                echo $this->Form->input('is_right', array(
+                    'type' => 'select',
+                    'options' => array(0 => 'No', 1=> 'Yes'),
+                    'label' => 'Is Right'
+                    ));
+            }
+        ?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit'));?>
 </div>

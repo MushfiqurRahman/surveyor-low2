@@ -1,5 +1,4 @@
-<div class="surveys index">
-    <?php echo $this->element('search_form');?>
+<?php echo $this->element('search_form');?>
 	<h2><?php echo __('Surveys');?></h2>
         
         
@@ -29,7 +28,7 @@
                                     <th class="hidden-phone">Phone No</th>
                                     <th class="hidden-phone">AGE</th>                                                    
                                     <th class="hidden-phone">Occupation</th>
-                                    <th class="hidden-phone">Brand</th>
+                                    <th class="hidden-phone">Brand</th>                                    
                                     <th class="hidden-phone">Permission Slip Date</th>
                                     <th class="hidden-phone">Is Correct</th>
                                     <th class="hidden-phone">Date</th>
@@ -82,15 +81,16 @@
                     </table>
         <div class="paging">
 	<?php
-            echo $this->Paginator->counter(array(
-            'format' => __('Showing {:current} records out of {:count} total')
-            ));
-            echo '<br/>';
-		echo $this->Paginator->prev('< ' . __('previous | '), array(), null, array('class' => 'prev disabled'));
-		echo $this->Paginator->numbers(array('separator' => ' | '));
-		echo $this->Paginator->next(__(' | next') . ' >', array(), null, array('class' => 'next disabled'));
+            if( isset($surveys) && !empty($surveys) ){
+                echo $this->Paginator->counter(array(
+                'format' => __('Showing {:current} records out of {:count} total')
+                ));
+                echo '<br/>';
+                    echo $this->Paginator->prev('< ' . __('previous | '), array(), null, array('class' => 'prev disabled'));
+                    echo $this->Paginator->numbers(array('separator' => ' | '));
+                    echo $this->Paginator->next(__(' | next') . ' >', array(), null, array('class' => 'next disabled'));
+            }
 	?>
 	</div>
         </div>
     </div>
-</div>

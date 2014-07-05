@@ -28,8 +28,32 @@ class SurveysController extends AppController {
  * @return void
  */
     public function index() {
-        $this->Survey->recursive = 0;
+        $this->Survey->Behaviors->load('Containable');
+        $this->paginate = array(
+            'contain' => $this->Survey->get_contain_array(),
+            'order' => array('Survey.created' => 'DESC'),
+            'limit' => $this->Auth->user('pagination_limit'));
         $this->set('surveys', $this->paginate());
+    }
+    
+    public function search_result(){
+        $this->paginate = array();//this line is important when nothing found by search
+        $this->Survey->Behaviors->load('Containable');
+        $conditions = array();
+        $conditions['is_sup'] = $this->request->query['is_sup'];
+        $conditions['representative_id'] = $this->Survey->Representative->field('id',array(
+            'br_code' => $this->request->query['br_code']
+        ));
+        if( !$conditions['representative_id']){            
+            $this->Session->setFlash(__('Invalid BR Code. Please insert valid BR Code'));
+        }else{
+            $this->paginate = array(
+                'contain' => $this->Survey->get_contain_array(),
+                'conditions' => $conditions,
+                'order' => array('Survey.created' => 'DESC'),
+                'limit' => $this->Auth->user('pagination_limit'));
+            $this->set('surveys', $this->paginate());
+        }
     }
         
         /**
@@ -265,27 +289,29 @@ class SurveysController extends AppController {
  * @return void
  */
 	public function edit($id = null) {
-		$this->Survey->id = $id;
-		if (!$this->Survey->exists()) {
-			throw new NotFoundException(__('Invalid survey'));
-		}
-		if ($this->request->is('post') || $this->request->is('put')) {
-			if ($this->Survey->save($this->request->data)) {
-				$this->Session->setFlash(__('The survey has been saved'));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The survey could not be saved. Please, try again.'));
-			}
-		} else {
-			$this->request->data = $this->Survey->read(null, $id);
-		}
-		$campaigns = $this->Survey->Campaign->find('list');
-		$representatives = $this->Survey->Representative->find('list');
-		$moLogs = $this->Survey->MoLog->find('list');
-		
-		$occupations = $this->Survey->Occupation->find('list');
-		$houses = $this->Survey->House->find('list');
-		$this->set(compact('campaigns', 'representatives', 'moLogs', 'ages', 'occupations', 'houses'));
+            $this->Survey->id = $id;
+            if (!$this->Survey->exists()) {
+                    throw new NotFoundException(__('Invalid survey'));
+            }
+            if ($this->request->is('post') || $this->request->is('put')) {
+//                pr($this->data);exit;
+                    if ($this->Survey->save($this->request->data)) {
+                            $this->Session->setFlash(__('The survey has been saved'));
+                            $this->redirect(array('action' => 'index'));
+                    } else {
+                            $this->Session->setFlash(__('The survey could not be saved. Please, try again.'));
+                    }
+            } else {
+                    $this->request->data = $this->Survey->read(null, $id);
+            }
+            $campaigns = $this->Survey->Campaign->find('list');
+            $representatives = $this->Survey->Representative->find('list');
+            $moLogs = $this->Survey->MoLog->find('list');
+
+            $occupations = $this->Survey->Occupation->find('list');
+            $brands = $this->Survey->Brand->find('list');
+            $houses = $this->Survey->House->find('list');
+            $this->set(compact('campaigns', 'representatives', 'moLogs', 'ages', 'occupations', 'brands', 'houses'));
 	}
 
 /**

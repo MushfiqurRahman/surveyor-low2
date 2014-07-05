@@ -1,0 +1,14 @@
+2014-07-05 11:15:49 Error: [NotFoundException] Invalid survey
+#0 [internal function]: SurveysController->edit('favicon.png')
+#1 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Controller\Controller.php(485): ReflectionMethod->invokeArgs(Object(SurveysController), Array)
+#2 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(103): Controller->invokeAction(Object(CakeRequest))
+#3 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(85): Dispatcher->_invoke(Object(SurveysController), Object(CakeRequest), Object(CakeResponse))
+#4 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2014-07-05 11:15:50 Error: [NotFoundException] Invalid survey
+#0 [internal function]: SurveysController->edit('favicon.png')
+#1 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Controller\Controller.php(485): ReflectionMethod->invokeArgs(Object(SurveysController), Array)
+#2 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(103): Controller->invokeAction(Object(CakeRequest))
+#3 E:\xampp\htdocs\2014\surveyor-low2\lib\Cake\Routing\Dispatcher.php(85): Dispatcher->_invoke(Object(SurveysController), Object(CakeRequest), Object(CakeResponse))
+#4 E:\xampp\htdocs\2014\surveyor-low2\app\webroot\index.php(92): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
