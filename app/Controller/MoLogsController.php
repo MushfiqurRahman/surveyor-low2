@@ -16,7 +16,7 @@ App::uses('AppController', 'Controller');
 class MoLogsController extends AppController{
     //put your code here    
     
-    var $keywords = array('PTR', 'SUP');
+    var $keywords = array('PTR', 'SUP', 'BR');
     var $occupations = array();
     
     public function beforeFilter(){
@@ -106,7 +106,7 @@ class MoLogsController extends AppController{
     }
     
     /**
-     * @desc Save and update Sale and SaleDetail
+     * @desc Save and update 
      * @param type $rep_id
      * @param type $outlet_id
      * @param type $sec_id
@@ -130,7 +130,7 @@ class MoLogsController extends AppController{
         foreach($surv_detail as $k => $v ){
             $data['Survey'][$k] = $v;
         }        
-        //echo '<pre>';print_r($data);exit;
+//        echo '<pre>';print_r($data);exit;
         
         if( !$survey_id ){
             $this->Survey->create();
@@ -141,7 +141,7 @@ class MoLogsController extends AppController{
     /**
      * Check the sale message format, product codes validity and also format and array for sale detail
      */
-    protected function _format_survey( $params, $survey_id = null, $survey_counter = 1, $moLogId, $surveyDetails = array(), $isSup = false ){
+    protected function _format_survey( $params, $survey_id = null, $survey_counter = 1, $moLogId, $surveyDetails = array(), $keyWord = '' ){
         
         $data = array();
         
@@ -155,7 +155,7 @@ class MoLogsController extends AppController{
             }
         }
         //When the data is coming from PTR rather SUP
-        if( !$isSup ){
+        if( $keyWord=='PTR' ){
                 //checking Age
             if( !is_numeric($params[4]) ){
                 $data['error'] = 'Sorry! Invalid Age';
@@ -205,7 +205,8 @@ class MoLogsController extends AppController{
             }
             $data['Survey']['name'] = $params[2];
             $data['Survey']['phone'] = $params[3];
-        }else{
+            
+        }else if( $keyWord=='SUP'){
             //check mobile no
             if( strlen($params[2])<11 || strlen($params[2])>11 ){
                 $data['error'] = 'Sorry! Consumer phone number must be of 11 digits. Please try again with right number.';
@@ -221,6 +222,25 @@ class MoLogsController extends AppController{
             $data['Survey']['is_sup'] = 1;
             $data['Survey']['permission_slip_date'] = $params[3];
             $data['Survey']['is_right'] = $params[4]=='R'?1:0;
+            
+        }//sms format br, brid, outlet id code or name, date, mobile no, amount, counter
+        else if( $keyWord=='BR' ){
+            //check mobile no
+            if( strlen($params[4])<11 || strlen($params[4])>11 ){
+                $data['error'] = 'Sorry! Consumer phone number must be of 11 digits. Please try again with right number.';
+                return $data;
+            }
+            
+            //checking the date format
+            if( date('Y-m-d', strtotime($params[3])) != $params[3] ){
+                $data['error'] = 'Sorry! Invalid date format. Please write the date format as yyyy-mm-dd and try again.';
+                return $data;
+            }
+            $data['Survey']['phone'] = $params[4];            
+            $data['Survey']['permission_slip_date'] = $params[3];
+            $data['Survey']['amount'] = $params[5];
+            $data['Survey']['outlet'] = $params[2];
+            $data['Survey']['is_br'] = 1;
         }
         
         
@@ -236,9 +256,9 @@ class MoLogsController extends AppController{
      * @param type $msg_counter
      * @return boolean 
      */
-    protected function _is_update( $repId, $customer_phone_no, $msg_counter = 0, $isSup = false ){
+    protected function _is_update( $repId, $customer_phone_no, $msg_counter = 0, $keyWord = '' ){
         //when checking the supervisers sms
-        if( $isSup ){
+        if( $keyWord=='SUP' ){
             $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
                         'WHERE surveys.representative_id='.$repId.
                         ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
@@ -252,7 +272,7 @@ class MoLogsController extends AppController{
             }
             return false;
         }//when checking the representatives sms
-        else{
+        else if( $keyWord=='PTR'){
             $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
                         'WHERE surveys.representative_id='.$repId.
                         ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
@@ -260,6 +280,22 @@ class MoLogsController extends AppController{
                         ' AND surveys.is_sup=0'.
                         ' AND DATE(surveys.created)="'.date('Y-m-d').'"';
             $res = $this->MoLog->query($qry);
+
+            if( count($res)>0 ){
+                return $res;
+            }
+            return false;
+            
+        }else if( $keyWord=='BR' ){ //when the keyword is BR
+            $qry = 'SELECT surveys.id, surveys.survey_counter FROM surveys '.
+                        'WHERE surveys.representative_id='.$repId.
+                        ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
+                        ' AND surveys.survey_counter='.$msg_counter.
+                        ' AND surveys.is_br=1'.
+                        ' AND DATE(surveys.created)="'.date('Y-m-d').'"';
+            $res = $this->MoLog->query($qry);
+            
+//            pr($res);exit;
 
             if( count($res)>0 ){
                 return $res;
@@ -289,7 +325,7 @@ class MoLogsController extends AppController{
         
         $this->layout = $this->autoRender = false;
         $processed = $this->_processing();
-        //print_r($processed);
+//        pr($processed);exit;
         $errorFound = true;
         
         //check whether the received message is sent during campaign time or not
@@ -299,7 +335,8 @@ class MoLogsController extends AppController{
         }else{
             $ttl_msg_part = count($processed['params']);
             
-            if( $processed['params'][0]!='PTR' && $processed['params'][0]!='SUP'){
+            if( $processed['params'][0]!='PTR' && $processed['params'][0]!='SUP'
+               && $processed['params'][0]!='BR'){
                 $error = "Your keyword is wrong, please try again with right keywork.";
             }
             else if( $processed['params'][0]=='PTR' && (!is_numeric($processed['params'][$ttl_msg_part-1]) || 
@@ -310,7 +347,11 @@ class MoLogsController extends AppController{
                 $ttl_msg_part != 6) ){
                 $error = "Your SMS format is wrong, plesae try again with right format.";            
                 
-            }else if( strlen($processed['mobile_number']) <13 || strlen($processed['mobile_number'])>13 ){
+            }else if( $processed['params'][0]=='BR' && (!is_numeric($processed['params'][$ttl_msg_part-1]) || 
+                $ttl_msg_part != 7 || !is_numeric($processed['params'][$ttl_msg_part-2]))){
+                $error = "Your SMS format is wrong, plesae try again with right format.";            
+            }
+            else if( strlen($processed['mobile_number']) <13 || strlen($processed['mobile_number'])>13 ){
                 $error = 'Sorry! Your mobile number is invalid.';
             }else{                           
                 $repId = $this->MoLog->check_rep_br_code( $processed['params'][1]);
@@ -325,12 +366,12 @@ class MoLogsController extends AppController{
                     //when the keyword is 'PTR'
                     if($processed['params'][0]=='PTR' ){
                         
-                        $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][3], $processed['params'][7]);
+                        $res = $this->_is_update($repId[0]['representatives']['id'], $processed['params'][3], $processed['params'][7], 'PTR');
 
                         if( isset($res['error']) ){
                             $error = $res['error'];
                         }else if(count($res)>0 && $res!=false) { 
-                            $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'], $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res);
+                            $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'], $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res, 'PTR');
 
                             if( isset($survey_detail['error']) ){   
                                 $error = $survey_detail['error'];
@@ -344,7 +385,7 @@ class MoLogsController extends AppController{
                             }
                         }
                         else {
-                            $survey_detail = $this->_format_survey($processed['params'], null, $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId']);
+                            $survey_detail = $this->_format_survey($processed['params'], null, $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], array(), 'PTR');
 
                             if( isset($survey_detail['error']) ){                    
                                 $error = $survey_detail['error'];
@@ -361,15 +402,15 @@ class MoLogsController extends AppController{
                             }
                         }
                     }//when the keyword is 'SUP'
-                    else{
+                    else if($processed['params'][0]=='SUP' ){
                         $res = $this->_is_update($repId[0]['representatives']['id'],
-                                $processed['params'][2], $processed['params'][5], true);
+                                $processed['params'][2], $processed['params'][5], 'SUP');
 
                         if( isset($res['error']) ){
                             $error = $res['error'];
                         }else if(count($res)>0 && $res!=false) { 
                             $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'],
-                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res, 1);
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res, 'SUP');
 
                             if( isset($survey_detail['error']) ){   
                                 $error = $survey_detail['error'];
@@ -384,7 +425,43 @@ class MoLogsController extends AppController{
                         }
                         else {
                             $survey_detail = $this->_format_survey($processed['params'], null, 
-                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], array(), 1);
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], array(), 'SUP');
+
+                            if( isset($survey_detail['error']) ){                    
+                                $error = $survey_detail['error'];
+                            }else{                            
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'],
+                                        $survey_detail['Survey']);//                    
+
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been received.';
+                            }
+                        }
+                    }else if($processed['params'][0]=='BR' ){//when the keyword is BR
+                        $res = $this->_is_update($repId[0]['representatives']['id'],
+                                $processed['params'][4], $processed['params'][6], 'BR');
+
+                        if( isset($res['error']) ){
+                            $error = $res['error'];
+                        }else if(count($res)>0 && $res!=false) { 
+                            $survey_detail = $this->_format_survey($processed['params'], $res[0]['surveys']['id'],
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], $res, 'BR');
+
+                            if( isset($survey_detail['error']) ){   
+                                $error = $survey_detail['error'];
+                            }else{
+                                $this->_save_surveys($repId[0]['representatives']['id'], $repId[0]['representatives']['house_id'],
+                                        $processed['mobile_number'], $processed['params'][$ttl_msg_part-1], $processed['created'], 
+                                        $survey_detail['Survey'], $res[0]['surveys']['id']);   
+
+                                $errorFound = false;
+                                $msg = 'Thank you! Your message have been updated.';
+                            }
+                        }
+                        else {
+                            $survey_detail = $this->_format_survey($processed['params'], null, 
+                                    $processed['params'][ $ttl_msg_part - 1 ], $processed['lastMoLogId'], array(), 'BR');
 
                             if( isset($survey_detail['error']) ){                    
                                 $error = $survey_detail['error'];
