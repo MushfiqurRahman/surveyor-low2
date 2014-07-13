@@ -41,13 +41,23 @@ class SurveysController extends AppController {
         $this->Survey->Behaviors->load('Containable');
         $conditions = array();
         $conditions['is_sup'] = $this->request->query['is_sup'];
+        $conditions['is_br'] = $this->request->query['is_br'];
         $conditions['representative_id'] = $this->Survey->Representative->field('id',array(
             'br_code' => $this->request->query['br_code']
         ));
         if( !$conditions['representative_id']){            
             $this->Session->setFlash(__('Invalid BR Code. Please insert valid BR Code'));
         }else{
+//            $containArray = array();
+//            if( $this->request->query['is_sup']){
+//                $containArray = $this->Survey->get_sup_contain_array();
+//            }else if( $this->request->query['is_br']){
+//                $containArray = $this->Survey->get_br_contain_array();
+//            }else{
+//                $containArray = $this->Survey->get_contain_array();
+//            }
             $this->paginate = array(
+//                'contain' => $containArray,
                 'contain' => $this->Survey->get_contain_array(),
                 'conditions' => $conditions,
                 'order' => array('Survey.created' => 'DESC'),
@@ -67,6 +77,7 @@ class SurveysController extends AppController {
                 $achievements['achieved_total'] = $this->Survey->find('count', array('conditions' => array(
                     'campaign_id' => $this->current_campaign_detail['Campaign']['id'],
                     'is_sup' => 0,
+                    'is_br' => 0,
                     ),
                     'recursive' => -1));
 
@@ -265,6 +276,43 @@ class SurveysController extends AppController {
                     'order' => array('Survey.created' => 'DESC'),      
                 ));                 
                 $Surveys = $this->Survey->format_for_sup_export($Surveys);
+                $this->set('surveys',$Surveys); 
+            }
+        }
+        
+        /**
+         * @desc Export report in xlsx file 
+         */
+        public function export_br_report(){
+            $this->layout = 'ajax';        
+            
+            ini_set('memory_limit', '2024M');
+            
+            if( !empty($this->request->data) ){
+                
+                $houseList = $this->Survey->House->house_list($this->request->data);
+                       
+                if( isset($this->request->data['House']['id']) && !empty($this->request->data['House']['id']) ){
+                    $houseIds[] = $this->request->data['House']['id'];
+                }else{
+                    $houseIds = $this->Survey->House->id_from_list($houseList);                
+                }   
+                
+                $this->Survey->unbindModel(array('belongsTo' => 
+                    array('Campaign','MoLog'),
+                    'hasOne' => array('Feedback')));
+
+                $Surveys = $this->Survey->find('all', array(
+                    'fields' => array('id','house_id','representative_id',
+                        'phone','outlet', 'permission_slip_date','amount',
+                        'created', 'Representative.name','Representative.br_code',
+                        'Representative.superviser_name',
+                        'House.title','House.area_id'),
+                    //'conditions' => $this->Survey->set_conditions($SurveyIds, $this->request->data),
+                    'conditions' => $this->Survey->set_br_conditions($houseIds, $this->request->data, $this->current_campaign_detail['Campaign']['id']),
+                    'order' => array('Survey.created' => 'DESC'),      
+                ));                 
+                $Surveys = $this->Survey->format_for_br_export($Surveys);
                 $this->set('surveys',$Surveys); 
             }
         }

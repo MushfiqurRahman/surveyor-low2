@@ -30,8 +30,8 @@
     header("Content-Transfer-Encoding: binary ");
     xlsBOF();
     
-    $tableHeaders = array('ID', 'Region', 'Area', 'House', 'BR Name', 'BR Code', 'SUP Name', 'Consumer Name',
-        'Phone', 'Age', 'Occupation', 'Brand', 'Date');
+    $tableHeaders = array('ID', 'Region', 'Area', 'House', 'BR Name', 'BR Code',
+        'SUP Name','Outlet', 'Phone', 'Date', 'Amount', 'Created');
     $i = 0;
     foreach( $tableHeaders as $th ){
         xlsWriteLabel(0, $i, $th);
@@ -42,7 +42,7 @@
     foreach($surveys as $srv){
         $col = 0;
         foreach($srv as $v){
-            if( $col==0 || $col==5 ||  $col==9 ){
+            if( $col==0 || $col==5 || $col==10 ){
                 xlsWriteNumber($xlsRow,$col,$v);
             }else{
                 xlsWriteLabel($xlsRow,$col,$v);

@@ -212,7 +212,7 @@
                             </div>
                     </div>
                     <!-- END EXAMPLE TABLE PORTLET-->
-                    <form action="export_sup_report" method="post">
+                    <form action="export_br_report" method="post">
                         <input type="hidden" name="data[Region][id]" value="<?php echo isset($this->data['Region']['id']) ? $this->data['Region']['id'] : '';?>"/>
                         <input type="hidden" name="data[Area][id]" value="<?php echo isset($this->data['Area']['id']) ? $this->data['Area']['id'] : '';?>"/>
                         <input type="hidden" name="data[House][id]" value="<?php echo isset($this->data['House']['id']) ? $this->data['House']['id'] : '';?>"/>

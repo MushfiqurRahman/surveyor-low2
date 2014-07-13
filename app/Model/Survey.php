@@ -367,6 +367,7 @@ class Survey extends AppModel {
             }
             
             $conditions[]['Survey.is_sup'] = 0;
+            $conditions[]['Survey.is_br'] = 0;
             
             return $conditions;
         }
@@ -592,6 +593,43 @@ class Survey extends AppModel {
                 $formatted[$i]['permission_slip_date'] = $srv['Survey']['permission_slip_date'];
                 $formatted[$i]['is_right'] = $srv['Survey']['is_right'];
                 $formatted[$i]['date'] = date('Y-m-d',strtotime($srv['Survey']['created']));
+                
+                $i++;
+            }
+            return $formatted;
+        }
+        
+        /**
+         * @desc Used in surveys controller for excel export. In the export_report method
+         * @param type $surveys 
+         */
+        public function format_for_br_export( $surveys ){
+            $areaRegionList = $this->House->Area->find('all', array('fields' => array('id','region_id','title', 'Region.title'),
+                'recursive' => 0));
+                        
+            $formatted = array();
+            $i = 0;
+            
+            foreach( $surveys as $srv ){
+//                $formatted[$i]['id'] = $srv['Survey']['id'];
+                $formatted[$i]['id'] = $i+1;
+                
+                foreach ($areaRegionList as $v){
+                    if( $v['Area']['id'] == $srv['House']['area_id'] ){
+                        $formatted[$i]['region'] = $v['Region']['title'];
+                        $formatted[$i]['area'] = $v['Area']['title'];
+                        break;
+                    }
+                }
+                $formatted[$i]['house'] = $srv['House']['title'];
+                $formatted[$i]['br_name'] = $srv['Representative']['name'];
+                $formatted[$i]['br_code'] = $srv['Representative']['br_code'];
+                $formatted[$i]['sup_name'] = $srv['Representative']['superviser_name'];
+                $formatted[$i]['outlet'] = $srv['Survey']['outlet'];
+                $formatted[$i]['phone_no'] = $srv['Survey']['phone'];
+                $formatted[$i]['date'] = $srv['Survey']['permission_slip_date'];
+                $formatted[$i]['amount'] = $srv['Survey']['amount'];
+                $formatted[$i]['created'] = date('Y-m-d',strtotime($srv['Survey']['created']));
                 
                 $i++;
             }

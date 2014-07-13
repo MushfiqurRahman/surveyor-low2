@@ -141,3 +141,7 @@
 8801685089560 Thank you! Your message have been updated.	2014-07-13 11:59 AM
 8801685089560 Thank you! Your message have been updated.	2014-07-13 12:00 PM
 8801685089560 Sorry! Invalid date format. Please write the date format as yyyy-mm-dd and try again.	2014-07-13 12:00 PM
+8801685089560 Thank you! Your message have been received.	2014-07-13 02:35 PM
+8801685089560 Thank you! Your message have been updated.	2014-07-13 02:39 PM
+8801685089560 Sorry! Invalid date format. Please write the date format as yyyy-mm-dd and try again.	2014-07-13 02:40 PM
+8801685089560 Thank you! Your message have been received.	2014-07-13 02:40 PM

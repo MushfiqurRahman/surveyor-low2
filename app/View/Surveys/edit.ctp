@@ -8,13 +8,15 @@
             echo $this->Form->input('representative_id');
             echo $this->Form->input('survey_counter');
             echo $this->Form->input('phone', array('required' => true));
-            if( !$this->data['Survey']['is_sup']) {
+            //for the PTR survey
+            if( !$this->data['Survey']['is_sup'] && !$this->data['Survey']['is_br']) {
                 echo $this->Form->input('name', array('required' => true));
                 echo $this->Form->input('brand_id');                    
                 echo $this->Form->input('age', array('required' => true));
                 echo $this->Form->input('occupation_id', array('empty' => 'Select Occupation'));
-            }else{
+            }else if($this->data['Survey']['is_sup']){
         ?>
+                <label>Permission Slip Date</label>
             <input size="25" name="data[Survey][permission_slip_date]" onFocus="this.value=''" onClick="showCalendarControl(this);" type="text"  value="<?php echo isset($this->data['Survey']['permission_slip_date']) ? $this->data['Survey']['permission_slip_date'] : '';?>" required="required"/>
         <?php
                 echo $this->Form->input('is_right', array(
@@ -22,6 +24,14 @@
                     'options' => array(0 => 'No', 1=> 'Yes'),
                     'label' => 'Is Right'
                     ));
+            }else if($this->data['Survey']['is_br']){
+                echo $this->Form->input('outlet', array('required' => true));
+                
+        ?>
+            <label>Date</label>
+            <input size="25" name="data[Survey][permission_slip_date]" onFocus="this.value=''" onClick="showCalendarControl(this);" type="text"  value="<?php echo isset($this->data['Survey']['permission_slip_date']) ? $this->data['Survey']['permission_slip_date'] : '';?>" required="required"/>
+        <?php
+                echo $this->Form->input('amount', array('required' => true));
             }
         ?>
 	</fieldset>
