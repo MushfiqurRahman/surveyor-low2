@@ -158,6 +158,41 @@ class SurveysController extends AppController {
         }
         
         /**
+         * Report for BR survey data. I mean when the keyword is BR
+         */
+        public function br_report(){
+            $this->_set_request_data_from_params();  
+            
+            $houseList = $this->Survey->House->house_list($this->request->data);//('list', array('conditions' => $this->_set_conditions()));
+                                   
+            if( isset($this->request->data['House']['id']) && !empty($this->request->data['House']['id']) ){
+                $houseIds[] = $this->request->data['House']['id'];
+            }else{
+                $houseIds = $this->Survey->House->id_from_list($houseList);                
+            }
+            
+            $this->Survey->Behaviors->load('Containable');
+
+            $this->paginate = array(
+                'contain' => $this->Survey->get_br_contain_array(),
+                'conditions' => $this->Survey->set_br_conditions($houseIds, 
+                        $this->request->data, $this->current_campaign_detail['Campaign']['id']),                                    
+                'order' => array('Survey.created' => 'DESC'),
+                'limit' => $this->Auth->user('pagination_limit'),
+            );                
+            $Surveys = $this->paginate();
+            
+            $this->set('supervisers', $this->Survey->Representative->find('list', array(
+                'fields' => array('id','superviser_name'),
+                'conditions' => array('superviser_id' => 0,'house_id' => $houseIds)
+            )));
+            
+//            pr($Surveys);exit;
+                       
+            $this->set('Surveys', $Surveys);
+        }
+        
+        /**
          * @desc Export report in xlsx file 
          */
         public function export_report(){

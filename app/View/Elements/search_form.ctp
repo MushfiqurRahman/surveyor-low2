@@ -8,5 +8,8 @@
         'placeholder' => 'Search By BR Code', 'required' => true));
     echo $this->Form->input('is_sup', array('type' => 'select', 'label' => 'Is SUP Survey?',
         'options' => array(0 => 'No', 1 => 'Yes')));
+    
+    echo $this->Form->input('is_br', array('type' => 'select', 'label' => 'Is BR Survey?',
+        'options' => array(0 => 'No', 1 => 'Yes')));
     echo $this->Form->end('Search');
 ?>

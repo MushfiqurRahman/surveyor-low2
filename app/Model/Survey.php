@@ -302,6 +302,23 @@ class Survey extends AppModel {
         }
         
         /**
+        *
+        * @return type 
+        */
+        public function get_br_contain_array(){
+            return array(
+                'Representative' => array(
+                    'fields' => array('id', 'name','superviser_name', 'br_code'),
+                    'House' => array(
+                                'fields' => array('title'),
+                                'Area' => array(
+                                    'fields' => array('title'),
+                                    'Region' => array('fields' => array('title')))),
+                    ),
+            );
+        }
+        
+        /**
          *
          * @return type 
          */
@@ -378,6 +395,49 @@ class Survey extends AppModel {
                 $conditions[]['DATE(Survey.created) <='] = $data['end_date'];
             }            
             $conditions[]['Survey.is_sup'] = 1;
+            
+            if(isset($data['representative_id']) && !empty($data['representative_id'])){
+                //since superviser id has been select thats why representatives id should be found
+                $representativesList = $this->Representative->find('list', array(
+                    'fields' => array('id','name'),
+                    'conditions' => array('superviser_id' => $data['representative_id'])
+                ));
+                $representativesIds = array();
+                foreach($representativesList as $k =>$v){
+                    $representativesIds[] = $k;
+                }
+                $conditions[]['Survey.representative_id'] = $representativesIds;
+            }
+            
+//            $this->log(print_r($conditions,true),'error');
+            
+            return $conditions;
+        }
+        
+        /**
+         *
+         * @return type 
+         */
+        //public function set_conditions( $surveyIds = null, $data = array(), $is_feedback = false ){
+        public function set_br_conditions( $houseIds = null, $data = array(), $campaignId = false ){
+            
+            $conditions = array();            
+            
+            if( $campaignId ){
+                $conditions[]['Survey.campaign_id'] = $campaignId;
+            }
+            if( $houseIds ){
+                $conditions[]['Survey.house_id'] = $houseIds;                
+            }else{
+                $conditions[]['Survey.house_id'] = 0;
+            }
+            if( isset($data['start_date']) && !empty($data['start_date']) ){
+                $conditions[]['DATE(Survey.created) >='] = $data['start_date'];
+            }
+            if( isset($data['end_date']) && !empty($data['end_date']) ){
+                $conditions[]['DATE(Survey.created) <='] = $data['end_date'];
+            }            
+            $conditions[]['Survey.is_br'] = 1;
             
             if(isset($data['representative_id']) && !empty($data['representative_id'])){
                 //since superviser id has been select thats why representatives id should be found

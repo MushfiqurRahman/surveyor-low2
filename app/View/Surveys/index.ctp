@@ -25,13 +25,15 @@
                                     <th class="hidden-phone">BR Name</th>
                                     <th class="hidden-phone">BR Code</th>
                                     <th class="hidden-phone">SUP Name</th>
-                                    <th class="hidden-phone">Consumer Name</th>
+                                    <th class="hidden-phone">Outlet</th>
+                                    <th class="hidden-phone">Consumer Name</th>                                    
                                     <th class="hidden-phone">Phone No</th>
                                     <th class="hidden-phone">AGE</th>                                                    
                                     <th class="hidden-phone">Occupation</th>
-                                    <th class="hidden-phone">Brand</th>
+                                    <th class="hidden-phone">Brand</th>                                    
                                     <th class="hidden-phone">Permission Slip Date</th>
                                     <th class="hidden-phone">Is Correct</th>
+                                    <th class="hidden-phone">Amount</th>
                                     <th class="hidden-phone">Date</th>
                                     <th class="hidden-phone">Actions</th>
                                 </tr>
@@ -51,7 +53,8 @@
                                 <td class="center hidden-phone"><?php echo $srv['Representative']['name'];?></td>
                                 <td class="center hidden-phone"><?php echo $srv['Representative']['br_code'];?></td>
                                 <td class="hidden-phone"><?php echo $srv['Representative']['superviser_name'];?></td>
-                                <td class="hidden-phone"><?php echo $srv['Survey']['name'];?></td>
+                                <td class="hidden-phone"><?php echo $srv['Survey']['outlet'];?></td>
+                                <td class="hidden-phone"><?php echo $srv['Survey']['name'];?></td>                                
                                 <td class="hidden-phone"><?php echo $srv['Survey']['phone'];?></td>
                                 <td class="center hidden-phone"><?php echo $srv['Survey']['age'];?></td>                                                
                                 <td class="hidden-phone"><?php echo $srv['Occupation']['title'];?></td>
@@ -64,6 +67,7 @@
                                         }
                                     ?>
                                 </td>
+                                <td class="hidden-phone"><?php echo $srv['Survey']['amount'];?></td>
                                 <td class="hidden-phone"><?php echo $srv['Survey']['created'];?></td>
                                 <td class="hidden-phone">
                                     <?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $srv['Survey']['id'])); ?>
