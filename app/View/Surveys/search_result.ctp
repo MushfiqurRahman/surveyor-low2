@@ -1,5 +1,9 @@
 <?php echo $this->element('search_form');?>
-	<h2><?php echo __('Surveys');?></h2>
+	<h2>
+            <?php 
+                echo __('Surveys');
+        
+        ?></h2>
         
         
     <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -23,17 +27,51 @@
                                     <th class="hidden-phone">House</th>
                                     <th class="hidden-phone">BR Name</th>
                                     <th class="hidden-phone">BR Code</th>
-                                    <th class="hidden-phone">SUP Name</th>
-                                    <th class="hidden-phone">Outlet</th>
-                                    <th class="hidden-phone">Consumer Name</th>                                    
+                                    <th class="hidden-phone">SUP Name</th> 
+                                    <?php
+                                        if($this->request->query['is_sup'] || $this->request->query['is_br']):
+                                            $colTitle = $this->request->query['is_sup']==1?'Permission Slip Date':'Date';
+                                    ?>
+                                    <th class="hidden-phone"><?php echo $colTitle;?></th>
+                                    <?php
+                                        endif;
+                                    ?>                                    
                                     <th class="hidden-phone">Phone No</th>
+                                    <?php
+                                    
+                                        if($this->request->query['is_sup']):
+                                    ?>
+                                    <th class="hidden-phone">Is Correct</th>
+                                    <?php
+                                        endif;
+                                    
+                                        if($this->request->query['is_br']):
+                                    ?>
+                                    <th class="hidden-phone">Outlet</th>
+                                    <?php
+                                        endif;
+                                    
+                                        if($this->request->query['is_br']):
+                                    ?>
+                                    <th class="hidden-phone">Amount</th>
+                                    <?php
+                                        endif;
+                                        
+                                        if(!$this->request->query['is_sup'] && !$this->request->query['is_br']):
+                                            echo '<th class="hidden-phone">Consumer Name</th>';
+                                        endif;
+                                    ?>                                  
+                                    
+                                    <?php
+                                        if(!$this->request->query['is_sup'] && !$this->request->query['is_br']):                                            
+                                    ?>    
                                     <th class="hidden-phone">AGE</th>                                                    
                                     <th class="hidden-phone">Occupation</th>
-                                    <th class="hidden-phone">Brand</th>                                    
-                                    <th class="hidden-phone">Permission Slip Date</th>
-                                    <th class="hidden-phone">Is Correct</th>
-                                    <th class="hidden-phone">Amount</th>
-                                    <th class="hidden-phone">Date</th>
+                                    <th class="hidden-phone">Brand</th> 
+                                    <?php
+                                        endif;
+                                    ?>
+                                    <th class="hidden-phone">Created</th>
                                     <th class="hidden-phone">Actions</th>
                                 </tr>
                             </thead>
@@ -52,13 +90,18 @@
                                 <td class="center hidden-phone"><?php echo $srv['Representative']['name'];?></td>
                                 <td class="center hidden-phone"><?php echo $srv['Representative']['br_code'];?></td>
                                 <td class="hidden-phone"><?php echo $srv['Representative']['superviser_name'];?></td>
-                                <td class="hidden-phone"><?php echo $srv['Survey']['outlet'];?></td>
-                                <td class="hidden-phone"><?php echo $srv['Survey']['name'];?></td>                                
-                                <td class="hidden-phone"><?php echo $srv['Survey']['phone'];?></td>
-                                <td class="center hidden-phone"><?php echo $srv['Survey']['age'];?></td>                                                
-                                <td class="hidden-phone"><?php echo $srv['Occupation']['title'];?></td>
-                                <td class="hidden-phone"><?php echo $srv['Brand']['title'];?></td>
+                                
+                                <?php
+                                    if($this->request->query['is_sup'] || $this->request->query['is_br']):
+                                ?>
                                 <td class="hidden-phone"><?php echo $srv['Survey']['permission_slip_date'];?></td>
+                                <?php
+                                    endif;
+                                ?>
+                                <td class="hidden-phone"><?php echo $srv['Survey']['phone'];?></td>
+                                <?php
+                                    if($this->request->query['is_sup']):
+                                ?>
                                 <td class="hidden-phone">
                                     <?php
                                         if($srv['Survey']['is_sup']){
@@ -66,7 +109,42 @@
                                         }
                                     ?>
                                 </td>
+                                <?php
+                                    endif;
+                                ?>
+                                <?php
+                                    
+                                    if($this->request->query['is_br']):
+                                ?>
+                                    <td class="hidden-phone"><?php echo $srv['Survey']['outlet'];?></td>
+                                <?php
+                                    endif;
+                                    
+                                    if(!$this->request->query['is_sup'] && !$this->request->query['is_br']):
+                                ?>                                
+                                <td class="hidden-phone"><?php echo $srv['Survey']['name'];?></td>    
+                                <?php
+                                    endif;
+                                    
+                                    if(!$this->request->query['is_sup'] && !$this->request->query['is_br']):
+                                ?>
+                                <td class="center hidden-phone"><?php echo $srv['Survey']['age'];?></td>                                                
+                                <td class="hidden-phone"><?php echo $srv['Occupation']['title'];?></td>
+                                <td class="hidden-phone"><?php echo $srv['Brand']['title'];?></td>
+                                <?php
+                                    endif;                                    
+                                ?>
+                                
+                                
+                                <?php 
+                                    if($this->request->query['is_br']):
+                                ?>
                                 <td class="hidden-phone"><?php echo $srv['Survey']['amount'];?></td>
+                                
+                                <?php
+                                    endif;
+                                ?>
+                                
                                 <td class="hidden-phone"><?php echo $srv['Survey']['created'];?></td>
                                 <td class="hidden-phone">
                                     <?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $srv['Survey']['id'])); ?>

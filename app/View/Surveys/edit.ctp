@@ -6,7 +6,7 @@
             echo $this->Form->input('id');
             echo $this->Form->input('house_id');
             echo $this->Form->input('representative_id');
-            echo $this->Form->input('survey_counter');
+            //echo $this->Form->input('survey_counter');
             echo $this->Form->input('phone', array('required' => true));
             //for the PTR survey
             if( !$this->data['Survey']['is_sup'] && !$this->data['Survey']['is_br']) {
