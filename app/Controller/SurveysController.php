@@ -418,7 +418,7 @@ class SurveysController extends AppController {
 		}
 		if ($this->Survey->delete()) {
                     //for 'PTR' survey achievements should be adjusted
-                    if( !$surveyDetail['Survey']['is_sup']){  
+                    if( !$surveyDetail['Survey']['is_sup'] && !$surveyDetail['Survey']['is_br']){  
                         $this->loadModel('Achievement');
                         $this->Achievement->decrement_achievement($surveyDetail['Survey']['house_id'], $this->current_campaign_detail['Campaign']['id']);                        
                     }
