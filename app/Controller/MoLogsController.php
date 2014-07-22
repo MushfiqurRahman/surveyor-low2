@@ -277,7 +277,7 @@ class MoLogsController extends AppController{
                         'WHERE surveys.representative_id='.$repId.
                         ' AND surveys.campaign_id='.$this->current_campaign_detail['Campaign']['id'].
                         ' AND surveys.survey_counter='.$msg_counter.
-                        ' AND surveys.is_sup=0'.
+                        ' AND surveys.is_sup=0 AND surveys.is_br=0'.
                         ' AND DATE(surveys.created)="'.date('Y-m-d').'"';
             $res = $this->MoLog->query($qry);
 
