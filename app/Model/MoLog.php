@@ -145,9 +145,9 @@ public function mobile_number_process($mobile_num_temp) {
     	
     public function send_sms_free_of_charge($to, $msg,$recid,$keyword, $date = '', $time_int = 0){
     
-		$this->query("INSERT INTO mt_logs(msisdn, sms,keyword,datetime,time_int) VALUES('$to',".
+		$temp = $this->query("INSERT INTO mt_logs(msisdn, sms,keyword,datetime,time_int) VALUES('$to',".
                         "'$msg','$keyword','$date',$time_int)");
-		
+                
 		$date=date('Y-m-d h:i A');
 		$ftp = fopen("log.txt",'a+');
         	fwrite($ftp,$to." ".$msg."	".$date."\n");

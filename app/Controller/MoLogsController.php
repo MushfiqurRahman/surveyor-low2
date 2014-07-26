@@ -68,6 +68,8 @@ class MoLogsController extends AppController{
         $sms_text_temp = $_REQUEST['MSG'];
         $sms = $this->MoLog->sms_process($sms_text_temp);
         
+//        $this->log(print_r($_REQUEST, true),'error');
+        
         if( isset($_REQUEST['DATETIME']) && !empty($_REQUEST['DATETIME']) ){            
             $processed['created'] = $_REQUEST['DATETIME'];
             $processed['time_int'] = strtotime($processed['created']);
@@ -126,6 +128,7 @@ class MoLogsController extends AppController{
         $data['Survey']['rep_phone'] = $rep_phone;
         $data['Survey']['house_id'] = $house_id;
         $data['Survey']['survey_counter'] = $srv_counter; 
+        $data['Survey']['created'] = $created;
         
         foreach($surv_detail as $k => $v ){
             $data['Survey'][$k] = $v;
@@ -483,14 +486,20 @@ class MoLogsController extends AppController{
                 echo $error.'<br />';
             }else{
                 $this->MoLog->send_sms_free_of_charge($processed['mobile_number'], $error, 796, $processed['keyword'], $processed['date'], $processed['time_int']);
-            }            
+            }
+            if( isset($_REQUEST['is_curl'])){
+                $this->MoLog->send_sms_free_of_charge($processed['mobile_number'], $error, 796, $processed['keyword'], $processed['date'], $processed['time_int']);
+            }
             die();
         }else{
             if( isset($_REQUEST['DATETIME']) && !empty($_REQUEST['DATETIME']) ){
                 echo $msg.'<br />';
             }else{
                 $this->MoLog->send_sms_free_of_charge($processed['mobile_number'], $msg, 796, $processed['keyword'], $processed['date'], $processed['time_int']);
-            }            
+            }       
+            if( isset($_REQUEST['is_curl'])){
+                $this->MoLog->send_sms_free_of_charge($processed['mobile_number'], $msg, 796, $processed['keyword'], $processed['date'], $processed['time_int']);
+            }
             die();
         }
     }
