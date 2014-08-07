@@ -59,7 +59,7 @@
                                     </div>
                             </div>
                             <div class="portlet-body">
-                                    <div style="height:330px;">
+                                    <div style="height:380px;">
 
      <form class="form-horizontal" name="search" method="post" action="report" id="">
          
@@ -73,9 +73,9 @@
             //echo $this->Form->create('Survey',array('type' => 'get', 'action'=>'report', 'class' => 'form-horizontal'));    
             $selected_house_id = isset($this->data['House']['id']) ? $this->data['House']['id'] : '';
             echo $this->Form->input('House.id',array('type' => 'select', 'options' => $houses, 
-                'label' => false, 'class' => 'span6 m-wrap', 'empty' => 'Choose a House', 'selected' => $selected_house_id));
-        ?>
-        <?php
+                'label' => false, 'class' => 'span6 m-wrap', 'empty' => 'Choose a House', 
+                'selected' => $selected_house_id, 'id' => 'house_id'));
+                        
             if( isset($this->data['Region']['id']) ){
                 echo $this->Form->input('Region.id',array('type' => 'hidden'));
             }
@@ -86,6 +86,20 @@
 <!--        <input type="hidden" name="data[Region][id]" value="<?php echo $this->data['Region']['id'];?>"/>
         <input type="hidden" name="data[Area][id]" value="<?php echo $this->data['Area']['id'];?>"/>-->
 <!--        <input type="hidden" name="data[House][id]" value="<?php echo $this->data['House']['id'];?>"/>-->
+    </div>
+    
+    <br/>    
+    <label class="control-label">Superviser Name</label>
+    <div class="controls">
+        <?php 
+            $selected_superviser_id = isset($this->data['superviser_id']) ? $this->data['superviser_id'] : '';
+            echo $this->Form->input('superviser_id',array('type' => 'select', 
+                //'options' => $supervisers, 
+                'label' => false, 'class' => 'span6 m-wrap', 'id' => 'superviser_id',
+                'empty' => 'Choose a Superviser', 
+                'selected' => $selected_superviser_id
+                    ));
+        ?>
     </div>
     </div>
 
@@ -175,6 +189,11 @@
 //            }
             if( isset($this->data['brand_id']) ){
                 $url_params['brand_id'] = $this->data['brand_id'];
+            }
+            
+            //When Superviser filter has been added
+            if( isset($this->data['superviser_id']) ){
+                $url_params['superviser_id'] = $this->data['superviser_id'];
             }
             $this->Paginator->options(array('url' => $url_params));            
         ?>
@@ -276,6 +295,9 @@
                         <input type="hidden" name="data[Region][id]" value="<?php echo isset($this->data['Region']['id']) ? $this->data['Region']['id'] : '';?>"/>
                         <input type="hidden" name="data[Area][id]" value="<?php echo isset($this->data['Area']['id']) ? $this->data['Area']['id'] : '';?>"/>
                         <input type="hidden" name="data[House][id]" value="<?php echo isset($this->data['House']['id']) ? $this->data['House']['id'] : '';?>"/>
+                        
+                        <input type="hidden" name="data[superviser_id]" value="<?php echo isset($this->data['superviser_id']) ? $this->data['superviser_id'] : '';?>"/>
+                        
                         <input name="start_date" type="hidden" value="<?php echo isset($this->data['start_date']) ? $this->data['start_date'] : '';?>" />
                         <input name="end_date" type="hidden" value="<?php echo isset($this->data['end_date']) ? $this->data['end_date'] : '';?>" />   
 <!--                        <input type="hidden" name="adc" value="<?php //echo isset($this->data['adc']) ? $this->data['adc']: '';?>"/>-->
@@ -294,7 +316,25 @@
     </div>
 
 <script>
+    var base_url = '<?php echo Configure::read('base_url');?>';
     $(document).ready(function(){
-            
+        $("#house_id").change(function(){                    
+            find_supervisers( $(this).val() );	
+        });
+
+        function find_supervisers( houseId ){
+            $.ajax({
+                url: base_url+'representatives/ajax_superviser_list',
+                type: 'post',
+                data: 'house_id='+houseId,
+                success: function(response){					
+                        var supervisers = $.parseJSON(response);                        
+                        $("#superviser_id").html('<select name="data[superviser_id]" id="superviser_id"><option value="">All Superviser</option></select>');                        
+                        $.each(supervisers, function(ind,val){                                            
+                                $('#superviser_id').append('<option value="'+ind+'">'+val+'</option>');						
+                        });
+                }
+            });
+        }
     });
 </script>

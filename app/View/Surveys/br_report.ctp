@@ -61,7 +61,7 @@
 <div class="portlet-body">
     <div style="height:110px;">
 
-     <form class="form-horizontal" name="search" method="post" action="sup_report" id="">   
+     <form class="form-horizontal" name="search" method="post" action="br_report" id="">   
 
             <div>
                     <div class="control-group">
@@ -216,6 +216,7 @@
                         <input type="hidden" name="data[Region][id]" value="<?php echo isset($this->data['Region']['id']) ? $this->data['Region']['id'] : '';?>"/>
                         <input type="hidden" name="data[Area][id]" value="<?php echo isset($this->data['Area']['id']) ? $this->data['Area']['id'] : '';?>"/>
                         <input type="hidden" name="data[House][id]" value="<?php echo isset($this->data['House']['id']) ? $this->data['House']['id'] : '';?>"/>
+                        <input type="hidden" name="data[representative_id]" value="<?php echo isset($this->data['representative_id']) ? $this->data['representative_id'] : '';?>"/>
                         <input name="start_date" type="hidden" value="<?php echo isset($this->data['start_date']) ? $this->data['start_date'] : '';?>" />
                         <input name="end_date" type="hidden" value="<?php echo isset($this->data['end_date']) ? $this->data['end_date'] : '';?>" />   
                         <input type="submit" name="export_report" value="Export as Excel"/>

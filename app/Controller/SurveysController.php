@@ -95,6 +95,7 @@ class SurveysController extends AppController {
         }
         
         public function report(){
+            //pr($this->data);pr($this->request->params);exit;
             $this->_set_request_data_from_params();  
             
             $houseList = $this->Survey->House->house_list($this->request->data);//('list', array('conditions' => $this->_set_conditions()));
@@ -115,7 +116,8 @@ class SurveysController extends AppController {
                 'contain' => $this->Survey->get_contain_array(),
                 //'conditions' => $this->Survey->set_conditions($SurveyIds, $this->request->data),                                    
                 'conditions' => $this->Survey->set_conditions($houseIds, 
-                        $this->request->data, false, $this->current_campaign_detail['Campaign']['id']),                                    
+                        $this->request->data, false, 
+                        $this->current_campaign_detail['Campaign']['id']),                                    
                 'order' => array('Survey.created' => 'DESC'),
                 'limit' => $this->Auth->user('pagination_limit'),
             );                
@@ -133,6 +135,11 @@ class SurveysController extends AppController {
             $this->set('occupations', $this->Survey->Occupation->find('list'));
             $this->set('brands', $this->Survey->Brand->find('list'));
             $this->set('Surveys', $Surveys);
+            
+            $this->set('supervisers', $this->Survey->Representative->find('list', array(
+                'fields' => array('id','superviser_name'),
+                'conditions' => array('superviser_id' => 0,'house_id' => $houseIds)
+            )));
         }
         
         /**

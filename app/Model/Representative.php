@@ -167,4 +167,17 @@ class Representative extends AppModel {
             }
             return $repList;
         }
+        
+        /**
+         * @desc Used in Surveys Controller report method
+         * @param type $supId
+         * @return type
+         */
+        public function id_by_superviser_id($supId){
+            return $this->find('list', array(
+                'fields' => array('id'),
+                'conditions' => array(
+                    'superviser_id' => $supId
+                )));
+        }
 }

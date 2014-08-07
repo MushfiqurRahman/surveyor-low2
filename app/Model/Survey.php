@@ -366,6 +366,20 @@ class Survey extends AppModel {
                 $conditions[]['Survey.brand_id'] = $data['brand_id'];
             }
             
+            if( isset($data['representative_id']) && !empty($data['representative_id']) ){
+                $conditions[]['Survey.representative_id'] = $data['representative_id'];
+            }
+            
+            /**
+             * The following filter has been added for the PTR report. date: August 7 2014
+             */
+            if( isset($data['superviser_id']) && 
+                !empty($data['superviser_id']) ){
+                
+                $representativeIds = $this->Representative->id_by_superviser_id($data['superviser_id']);
+                $conditions[]['Survey.representative_id'] = $representativeIds;
+            }
+            
             $conditions[]['Survey.is_sup'] = 0;
             $conditions[]['Survey.is_br'] = 0;
             
@@ -575,8 +589,8 @@ class Survey extends AppModel {
             $i = 0;
             
             foreach( $surveys as $srv ){
-//                $formatted[$i]['id'] = $srv['Survey']['id'];
-                $formatted[$i]['id'] = $i+1;
+                $formatted[$i]['id'] = $srv['Survey']['id'];
+//                $formatted[$i]['id'] = $i+1;
                 
                 foreach ($areaRegionList as $v){
                     if( $v['Area']['id'] == $srv['House']['area_id'] ){
@@ -611,8 +625,8 @@ class Survey extends AppModel {
             $i = 0;
             
             foreach( $surveys as $srv ){
-//                $formatted[$i]['id'] = $srv['Survey']['id'];
-                $formatted[$i]['id'] = $i+1;
+                $formatted[$i]['id'] = $srv['Survey']['id'];
+//                $formatted[$i]['id'] = $i+1;
                 
                 foreach ($areaRegionList as $v){
                     if( $v['Area']['id'] == $srv['House']['area_id'] ){

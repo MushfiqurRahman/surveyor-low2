@@ -158,6 +158,16 @@ class AppController extends Controller {
             if( isset($this->request->params['named']['got_ptr']) ){
                 $this->request->data['Feedback']['got_ptr'] = $this->request->params['named']['got_ptr'];
             }
+            
+            //for SUP and BR report. Filtering by representative_id
+            if( isset($this->request->params['named']['representative_id']) ){
+                $this->request->data['representative_id'] = $this->request->params['named']['representative_id'];
+            }
+            
+            //for PTR report filtering by Superviser.
+            if( isset($this->request->params['named']['superviser_id']) ){
+                $this->request->data['superviser_id'] = $this->request->params['named']['superviser_id'];
+            }
         } 
     } 
     
